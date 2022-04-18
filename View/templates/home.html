@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="{{url_for('static', filename='style.css')}}" rel="stylesheet">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+        <title>Bookworm</title>
+    </head>
+    <body>
+        <div class="jumbotron">
+            <h1>BOOKWORM</h1>
+        </div>
+        <div class="liner" style="right:0px"></div>
+        <div class="liner" style="left:0px"></div>
+        {%if state == "True"%}
+            <div style="background-color: Gray; height: 30px; top:150px; position: absolute; width:100%; font-size: 15px; text-align:right; padding">
+                <div>
+                    <a href="/" style="margin-left:60px; color:LightGray; text-decoration:underline;"> Home</a>
+                    <a href="/myshelf" style="margin-left:60px;"> My Shelf</a>
+                    <div class="dropdown" style="margin-right: 150px; margin-left:60px; margin-top: 4px;">
+                        <span>{{username}}</span>
+                        <div class="dropdown-content"><p>{{email}}</p><a href="/logout">Log out</a></div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div style="background-color: Gray; height: 28px; top:150px; position: absolute; width:100%; font-size: 15px; text-align:right; padding-top:2px">
+                <div>
+                    <a href="/" style="margin-left:60px; color:LightGray; text-decoration:underline; margin-top:8px;"> Home</a>
+                    <a href="/login" style="margin-left:60px; margin-top:8px;">Log in</a>
+                    <a href="/create" style="margin-right: 150px; margin-left:60px; margin-top:12px;">Create account</a>
+                </div>
+            </div>
+        {%endif%}
+        <div class="container">
+        {% for book in books%}
+            {% set image = book[1] + '.jpg' %}
+            <div class="section", style="color:Navy;">
+                <img src= "{{url_for('static', filename=image)}}" style="width:150px">
+                <p style="font-size:25px;">Title: {{book[1]}}</p>
+                <p>Author: {{book[2]}}</p>
+                <p>Year: {{book[3]}}</p>
+                <div style="display: inline;">
+                <form action="/book" method="post" style="display: inline;">
+                <input name="book_id" type="hidden" value="{{book[0]}}">
+                <input type="submit" class="box4" value="Read">
+                </form>
+                &nbsp
+                {% if state== "True" %}
+                <form action="/add" method="post" style="display: inline;">
+                <input name="book_id" type="hidden" value="{{book[0]}}">
+                <input type="submit" class="box4" value="Add to my shelf">
+                </form>
+                {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+        <div class="bottom"><p style="margin-left: 60px; margin-top: 15px;">For any queries, contact: wormbook081@gmail.com</p></div>
+    </body>
+</html>

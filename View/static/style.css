@@ -1,0 +1,221 @@
+body {
+    background-color: Gainsboro;
+    color: LightGray;
+    font-weight: 400;
+    line-height: 1.5;
+    margin: 0;
+    text-align: left;
+
+}
+
+.container {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 450px;
+    padding-right: 150px;
+    padding-top: 80px;
+    padding-bottom: 80px;
+    background-color: inherit;
+    position: absolute;
+    top : 180px;
+    overflow: auto;
+}
+
+.box {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 300px;
+    padding-right: 150px;
+    background-color: inherit;
+    position: absolute;
+    top : 180px;
+    font-size: 20px;
+    color: Navy;
+    margin-bottom: 4px;
+}
+
+.box2{
+     border: 2px solid Black;
+     height: 30px;
+     width: 500px;
+     border-radius:25px;
+     background-color:LightGray;
+     padding-left : 20px;
+}
+
+.box2:hover{
+     background-color: WhiteSmoke ;
+}
+
+.box3{
+     border: 2px solid #252324;
+     height: 35px;
+     border-radius:10px;
+     background-color:DarkGray;
+     color: Gainsboro;
+}
+
+.box3:hover{
+  color: Navy;
+  background-color:gray;
+}
+
+.box4{
+     border: 2px solid #252324;
+     height: 35px;
+     border-radius:2px;
+     background-color:Lightgray;
+     color: Navy;
+}
+
+.box4:hover{
+  background-color:Darkgray;
+}
+.jumbotron {
+    background-color: black;
+    font-family: Papyrus;
+    font-size: 30px;
+    text-align: center;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    height: 150px;
+    width: 100%;
+    top:0;
+    position: absolute;
+    color: DodgerBlue;
+    text-shadow: 4px 4px Navy;
+}
+
+.bottom {
+  background-color: #252324;
+  color: Gainsboro;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  height: 60px;
+  text-align: left;
+  font-size: 20px;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.dropdown {
+  display: inline-block;
+  color: Navy;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 150px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 12px 16px;
+  z-index: 10;
+  text-align:center;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+  color:DodgerBlue;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.dropdown:hover{
+  color: LightGray;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+a{
+  text-decoration: None;
+  margin-top: 4px;
+  color: Navy
+}
+
+a:hover{
+  color: LightGray;
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.liner{
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  width: 5px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  height:100%;
+}
+
+.dot {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid DarkGray;
+
+}
+
+.dot:hover {
+  border: 3px solid DarkGray;;
+}
+
+img {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width: 150px;
+}
+
+.section {
+    padding: 1rem 18rem 1rem 2rem;
+    margin-bottom:30px;
+}
+
+.section:hover {
+    background-color: #e5e5e5;
+    border-radius: 15px;
+    transition: color 2s ease-in-out, background-color 0.15s ease-in-out;
+}
+
+.progress-container {
+  width: 100%;
+  height: 10px;
+  background: Gainsboro;
+  position: fixed;
+  z-index: 1;
+  top: 40px;
+}
+
+.progress-bar {
+  height: 10px;
+  background: Maroon;
+  position: fixed;
+  border-radius: 2px;
+  z-index: 1;
+}
+.progress-container2 {
+  width: 50%;
+  height: 15px;
+  background: Azure;
+  opacity: 0.5;
+  border-radius: 5px;
+  z-index: 1;
+  bottom: 3px;
+}
+
+.progress-bar2 {
+  height: 15px;
+  background: Maroon;
+  border-radius: 5px;
+  z-index: 1;
+}
+
+.close{
+  color:Navy;
+  font-weight: bold;
+  left: 300px;
+  background-color: transparent;
+  border: None;
+
+}
+.close:hover{
+  color: LightGray;
+}

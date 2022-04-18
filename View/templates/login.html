@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="{{url_for('static', filename='style.css')}}" rel="stylesheet">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+        <title>Bookworm</title>
+    </head>
+    <body>
+        <div class="jumbotron">
+            <h1>BOOKWORM</h1>
+        </div>
+        <div class="liner" style="right:0px"></div>
+        <div class="liner" style="left:0px"></div>
+
+        <div style="background-color: Gray; height: 28px; top:150px; position: absolute; width:100%; font-size: 15px; text-align:right; padding-top:2px">
+            <div>
+                <a href="/" style="margin-left:60px; margin-top:8px;"> Home</a>
+                <a href="/login" style="margin-left:60px; margin-top:8px; color:LightGray; text-decoration:underline;">Log in</a>
+                <a href="/create" style="margin-right: 150px; margin-left:60px; margin-top:12px;">Create account</a>
+            </div>
+        </div>
+
+       <div class="box" style="padding-top:120px;">
+            <form action="/login" method="post">
+                <p style="color:red;">
+                {% if state=="False"%}
+                    {{message}}
+                {% endif %}</p>
+                <p>Username</p>
+                <input type="text" id="username" autocomplete="off" name="username" class="box2">
+                <p>Password</p>
+                <input type="password" id="password" name="password" autocomplete="off" class="box2">
+                <p><input type="submit" value="Log in" class= "box3" style= "width: 70px;"></p>
+                <a href="/reset" style="font-size:15px; color: Navy;">Forgot password</a>
+            </form>
+        </div>
+        <div class="bottom"><p style="margin-left: 60px; margin-top: 15px;">For any queries, contact: wormbook081@gmail.com</p></div>
+    </body>
+</html>

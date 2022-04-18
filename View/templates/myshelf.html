@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="{{url_for('static', filename='style.css')}}" rel="stylesheet">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+        <title>Bookworm</title>
+
+        <script>
+            document.getElementById("myBar").style.width = scrolled + "%";
+        </script>
+    </head>
+    <body>
+        <div class="jumbotron">
+            <h1>BOOKWORM</h1>
+        </div>
+        <div class="liner" style="right:0px"></div>
+        <div class="liner" style="left:0px"></div>
+
+            <div style="background-color: Gray; height: 30px; top:150px; position: absolute; width:100%; font-size: 15px; text-align:right;">
+                <div>
+                    <a href="/" style="margin-left:60px;"> Home</a>
+                    <a href="/myshelf" style="margin-left:60px; color:LightGray; text-decoration:underline;"> My Shelf</a>
+                    <div class="dropdown" style="margin-right: 150px; margin-left:60px; margin-top: 4px;">
+                        <span>{{session.username}}</span>
+                        <div class="dropdown-content"><p>{{session.email}}</p><a href="/logout">Log out</a></div>
+                    </div>
+                </div>
+            </div>
+        <div class="container ">
+        {% if mybooks[1] == 0 %}
+            <p style="color: Black; opacity:0.5; left: 600px; font-size: 25px;">Oops! Your shelf is empty</p>
+        {% else %}
+            {% for mybook in mybooks[0] %}
+                {% set image = mybook.title + '.jpg' %}
+                {% set p = (((mybook['progress'][:-1] |int)/2)|string) + "%" %}
+                <div class="section" style="color: navy;">
+                    <img src= "{{url_for('static', filename=image)}}" style="width:150px">
+                    <p style="font-size:25px;">Title: {{mybook["title"]}}</p>
+                    <p>Author: {{mybook["author"]}}</p>
+                    <p>Year: {{mybook["year"]}}</p>
+                    <p style="display: inline; color:Maroon; font-weight: bold; ">{{mybook["progress"]}} &ensp; <div class="progress-container2">
+                    <div class="progress-bar2" id="Bar" style="width: {{p}}"></div>
+                    </div></p>
+                    <form action="/book" method="post" style="display: inline;">
+                    <input name="book_id" type="hidden" value="{{mybook["id"]}}">
+                    <input type="submit" class="box4" value="Read">
+                    </form>
+                    &nbsp
+                    <form action="/remove" method="post" style="display: inline;">
+                    <input name="book_id" type="hidden" value="{{mybook["id"]}}">
+                    <input type="submit" class="box4" value="Remove from my shelf">
+                    </form>
+                </div>
+            {% endfor %}
+        {% endif %}
+        </div>
+        <div class="bottom"><p style="margin-left: 60px; margin-top: 15px;">For any queries, contact: wormbook081@gmail.com</p></div>
+    </body>
+</html>

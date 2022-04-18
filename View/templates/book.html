@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="{{url_for('static', filename='style.css')}}" rel="stylesheet">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+        <title>Bookworm</title>
+
+        <script>
+        scroller = document.querySelector('#scroller')
+        window.onscroll = function() {myFunction()};
+
+        function myFunction() {
+          var winScroll = document.documentElement.scrollTop;
+          var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          var scrolled = (winScroll / height) * 100;
+          document.getElementById("myBar").style.width = scrolled + "%";
+        }
+
+        </script>
+
+    </head>
+
+   <body>
+       <div class="liner" style="right:0px"></div>
+        <div class="liner" style="left:0px"></div>
+        <div style="background-color: Black; height: 10px; top:0px; position: fixed; width:100%; left:0px;z-index:1;"></div>
+        <div style="background-color: DarkGray; height: 30px; top:10px; position: fixed; width:100%; padding-top:2px; z-index:10;">
+            {% if state=="True" %}
+            <form action="/close" method="post" style="display: inline;" id="note">
+                <input name="progress" id = "progress" type="hidden">
+                <input type="submit" class="close" value="<< Close Book" >
+            </form>
+            <div class="dropdown">
+                <span style="margin-left: 1300px; margin-top: 4px;">Text size</span>
+                <div class="dropdown-content" style="margin-left: 1250px;">
+                <form action="/custom" method="post">
+                <input name="fontsize" type="hidden" value="20px">
+                <input type="submit" value="Small" style="margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="fontsize" type="hidden" value="25px">
+                <input type="submit" value="Medium" style="margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="fontsize" type="hidden" value="30px">
+                <input type="submit" value="Large" style="margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="fontsize" type="hidden" value="35px">
+                <input type="submit" value="XLarge" style="margin: 3px;">
+                </form>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span style="margin-left: 60px; margin-top: 4px;">Text color</span>
+                <div class="dropdown-content">
+                <form action="/custom" method="post">
+                <input name="textcolor" type="hidden" value="Gainsboro">
+                <input type="submit" class="dot" style="background-color:Gainsboro; color: Gainsboro; margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="textcolor" type="hidden" value="Navy">
+                <input type="submit" class="dot" style="background-color: Navy; color:Navy; margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="textcolor" type="hidden" value="Black">
+                <input type="submit" class="dot" style="background-color:Black; color: Black; margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="textcolor" type="hidden" value="Green">
+                <input type="submit" class="dot" style="background-color: Green; color: Green; margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="textcolor" type="hidden" value="White">
+                <input type="submit" class="dot" style="background-color: White; color: White; margin: 3px;">
+                </form>
+                </div>
+            </div>
+            <div class="dropdown">
+                <span style="margin-left: 60px; margin-right:120px; margin-top: 4px;">Background</span>
+                <div class="dropdown-content">
+                <form action="/custom" method="post">
+                <input name="pagecolor" type="hidden" value="Gainsboro">
+                <input type="submit" class="dot" style="background-color: Gainsboro; color: Gainsboro; margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="pagecolor" type="hidden" value="AliceBlue">
+                <input type="submit" class="dot" style="background-color:AliceBlue; color: AliceBlue; margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="pagecolor" type="hidden" value="Cornsilk">
+                <input type="submit" class="dot" style="background-color:Cornsilk; color: Cornsilk; margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="pagecolor" type="hidden" value="Black">
+                <input type="submit" class="dot" style="background-color:Black; color: Black; margin: 3px;">
+                </form>
+                <form action="/custom" method="post">
+                <input name="pagecolor" type="hidden" value="White">
+                <input type="submit" class="dot" style="background-color:White; color: White; margin: 3px;">
+                </form>
+                </div>
+            </div>
+            {% else %}
+                <a href="/" style="font-weight: bold; left: 300px;"><< Close Book</a>
+            {% endif %}
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="myBar"></div>
+        </div>
+
+        <div>
+            {% if  state == "True" %}
+            {% set size = ((30+(tools[0][1][0:-2] | int)) | string)+ "px" %}
+            {% set b_c = tools[0][0] %}
+            {% set s = tools[0][1] %}
+            {% set t_c = tools[0][2] %}
+            <p style="text-align:center; font-size: {{size}}; color: {{t_c}}; font-weight: bold;">{{read[0]}}</p>
+            <div class="container" style="padding-right:300px; padding-left:300px; padding-top:100px; font-size: {{s}}; background-color:{{b_c}};">
+                {% for i in read[1] %}
+                    <div>
+                    {% for j in i %}
+                        <div class="dropdown" style="color: {{t_c}};">
+                                <span>{{j}}</span>
+                                <div class="dropdown-content">
+                                    <ul>
+                                     {% for k in [word, meaning] %}
+                                     <li style="color:black;">{{k}}</li>
+                                     {% endfor %}
+                                    </ul>
+                                </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endfor %}
+            {% else %}
+            <div class="container" style="padding-right:300px; padding-left:300px; top:50px; font-size: 25px;">
+                <p style="text-align:center; font-size: 30px; color: Black; font-weight: bold; bottom: 30px;">{{read[0]}}</p>
+                {% for i in read[1] %}
+                    <div style="color: Black;">
+                    {% for j in i %}
+                    {{j}}
+                    {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </body>
+</html>
