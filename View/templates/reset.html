@@ -43,7 +43,9 @@
                     <li>Atleast 8 characters long</li><li>Must include either $ or # or !</li><li>Must have a digit</li><li>Must have one alphabet letter</li>
                 </ul>
                 <p><input type="submit" value="Reset" class= "box3" style= "width: 70px;"></p>
+                </form>
                 {% else %}
+                <form action="/reset" method="post">
                     {% if state=="e_False" %}
                     <p style="color:red;">
                         {{message}}
@@ -52,8 +54,9 @@
                     <p>Email address</p>
                     <input type="text" id="email" autocomplete="off" name="email" class="box2">
                     <p><input type="submit" value="Send" class= "box3" style= "width: 70px;"></p>
-                {% endif %}
                 </form>
+                {% endif %}
+
         </div>
         <div class="bottom"><p style="margin-left: 60px; margin-top: 15px;">For any queries, contact: wormbook081@gmail.com</p></div>
     </body>
