@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, session
+from flask import Flask, redirect, render_template, request, session, jsonify
 from flask_session import Session
 from flask_mail import Mail, Message
 import sqlite3
@@ -37,6 +37,8 @@ def data(do = None, table = None, col = None, val = None, con = None):
         row = None
         if table!= None:
             if len(con) != 0:
+                if table == "dictionary":
+                    row = cur.execute(f"SELECT {col} FROM {table} WHERE {con[0]} LIKE ?",(con[1]+"%",)).fetchall()
                 if len(con) == 2:
                     row = cur.execute(f"SELECT {col} FROM {table} WHERE {con[0]} = ?",(con[1],)).fetchall()
                 else:
@@ -47,33 +49,48 @@ def data(do = None, table = None, col = None, val = None, con = None):
         db.close()
         return row
     if do== "insert":
+        key_id = True
         if table!= None and val!=None:
             l = "?,"*(len(val)-1)+"?"
             if col == None:
                 cur.execute(f"INSERT INTO {table} VALUES ({l})", val)
             else:
-                cur.execute(f"INSERT INTO {table} ({col}) VALUES ({l})", val)
+                key_id = cur.execute(f"INSERT INTO {table} ({col}) VALUES ({l})", val)
         db.commit()
         db.close()
-        return True
+        return key_id
     if do == "update":
         if table!= None and col!= None and con!= None and val!= None:
-            cur.execute(f"Update {table} SET {col} = ? WHERE {con[0]} = {con[1]}", val)
+            if len(con)==2:
+                cur.execute(f"Update {table} SET {col} = ? WHERE {con[0]} = ?", (val[0], con[1]))
+            if len(con)==4:
+                cur.execute(f"Update {table} SET {col} = ? WHERE {con[0]} = ? AND {con[2]} = ?", (val[0], con[1], con[3]))
         db.commit()
         db.close()
         return True
 
     if do == "delete":
         if table!=None and con!= None:
-            cur.execute(f"DELETE FROM {table} WHERE {con[0]} = ? AND {con[2]} = ?", (con[1], con[3]))
+            if len(con)==4:
+                cur.execute(f"DELETE FROM {table} WHERE {con[0]} = ? AND {con[2]} = ?", (con[1], con[3]))
+            if len(con)==2:
+                cur.execute(f"DELETE FROM {table} WHERE {con[0]} = ?", (con[1],))
         db.commit()
         db.close()
         return True
-
     db.commit()
     db.close()
     return
 
+
+def load():
+    d = {}
+    dict = data("select", "dictionary", "*", None, [])
+    for i in dict:
+        d[i[0].lower()]= i[1]
+    return d
+
+Dictionary = load()
 
 
 
@@ -82,7 +99,7 @@ class Person():
     def __init__(self):
         self.username = session["username"]
         self.email = session["email"]
-        self.password = session["password"]
+        self.password = session.get("password")
         if session.get("user"):
             self.id = data("select", "person", "id", None, ["username", str(session.get("user"))])[0][0]
             session["id"] = self.id
@@ -104,7 +121,7 @@ class Person():
         return {"username": us, "email": em, "password": pw}
 
     def verify(self):
-        pw = self.password
+        pw = session.get("password")
         check = 0
         if len(pw) < 8:
             return False
@@ -125,8 +142,7 @@ class Person():
         return False
 
     def login(self):
-        validity = self.valid()
-        if validity["username"] == True and validity["password"] == True:
+        if len(data("select", "person", "*", None, ["username", str(self.username), "password", str(self.password)])) != 0:
             return True
         return False
 
@@ -146,16 +162,17 @@ class Person():
             message = "Invalid Email Address!"
             return [False, message]
         data("insert", "person", "username, email, password", (self.username, self.email, self.password), [])
-        data("insert", "custom", None, (session["id"], "white", "20px", "black"), [])
+        key_id = data("select", "person", "id", None, ["username", self.username])[0][0]
+        data("insert", "custom", None, (key_id, "white", "20px", "black"), [])
         return [True]
 
     def reset(self, start, res_code, return_code):
         stop = time.time()
-        if stop - start > 320 or res_code != return_code:
+        if stop - start > 320 or str(res_code) != return_code:
             return [False,"Invalid code!"]
         if self.verify() == False or self.valid()["password"]==True:
             return [False,"Invalid password!"]
-        data("update", "person", "password", (self.password,), ["email", str(self.email)])
+        data("update", "person", "password", (session.get("password"),), ["email", str(self.email)])
         return [True]
 
 
@@ -194,15 +211,25 @@ class Book():
         return [book[0][0], lines]
 
     def progress(self):
-        prog = data("select", "relation", "progress", None, ["user_id", session["id"], "book_id", self.id])
+        prog = data("select", "relation", "progress", None, ["user_id", session.get("id"), "book_id", self.id])
         return prog[0][0]
 
-    def meaning(self):
-        m = data("select", "dictionary", "*", None, [])
-        words={}
-        for i in m:
-            words[i[0]]=i[1].split("##")
-        return words
+    @classmethod
+    def mean(cls, lines):
+        d={}
+        for line in lines:
+            for word in line:
+                word2 = word.lower()
+                while (True):
+                    if len(word2)==0:
+                        break
+                    if word2[len(word2)-1] in "abcdefghijklmnopqrstuvwxyz":
+                        break
+                    word2 = word2[0:-1]
+                if word2 in Dictionary.keys():
+                    meaning = Dictionary[word2]
+                    d[word] = meaning.split("##")
+        return d
 
 class Shelf():
 
@@ -222,7 +249,7 @@ class Shelf():
         ## Add book to personal db
         if session.get("user"):
             if len(data('select', 'relation', '*', None, ['user_id', session["id"], 'book_id', b_id])) == 0:
-                data("insert", "relation", None, (session.get("id"), b_id, "0%"), [])
+                data("insert", "relation", None, (session.get("id"), b_id, 0), [])
         return
 
     @classmethod
@@ -263,9 +290,7 @@ class Custom():
 
 
 
-
-
-
+## FLASK routes defined
 @app.route("/")
 def index():
     if session.get("user"):
@@ -315,25 +340,32 @@ def reset():
     if session.get("user"):
         session["user"] = None
     if request.method == "POST":
-        session["email"] = request.form.get("email")
-        if session["email"]:
-            user= Person()
-            if user.valid()["email"]:
-                res_code = random.randrange(100000,999999)
-                memo = Message(f"Your verification code: {res_code}\nReset your password within 5 minutes otherwise the code will expire.", recipients=[user.email])
+        if not request.form.get("resend"):
+            session["email"] = request.form.get("email")
+        session["username"] = None
+        session["password"] = None
+        user= Person()
+        if session["email"] or request.form.get("resend"):
+            if user.valid()["email"] or request.form.get("resend"):
+                session["res_code"] = random.randrange(100000,999999)
+                memo = Message("Verification Code", sender = "wormbook081@gmail.com", recipients=[user.email])
+                memo.body = f"Your BOOKWORM Verification Code: {session.get('res_code')}\nReset your password within 5 minutes otherwise the code will expire."
                 mail.send(memo)
-                start = time.time()
-                return render_template("reset.html", state = "2", message = "Your verification code will become invalid after 5 minutes")
+                session["start"] = time.time()
+                return render_template("reset.html", state = "2", message = "Verification code sent! It will expire in 5 minutes")
             return render_template("reset.html", state = "e_False", message = "No user account with this email address")
         else:
-            if user.email == None:
+            if session["email"] == '':
                 return render_template("reset.html", state = "e_False", message = "Please provide an email address")
             else:
-                return_code = request.form.get("reset")
+                session["return_code"] = request.form.get("verification code")
                 session["password"] = request.form.get("password")
-                reset_return = user.reset(start, res_code, return_code)
+                reset_return= user.reset(session.get("start"), session.get("res_code"), session.get("return_code"))
                 if reset_return[0]:
-                    return redirect("/login")
+                    session["start"]=None
+                    session["res_code"]=None
+                    session["return_code"] = None
+                    return render_template("login.html", state = "False", message = "Reset Password Successful! You may log in!")
                 return render_template("reset.html", state = "2_False", message = reset_return[1])
     return render_template("reset.html", state = "1")
 
@@ -341,16 +373,17 @@ def reset():
 #######################################################################################
 @app.route("/book", methods=["GET", "POST"])
 def read():
+    session["book_id"] = None
     if request.method == "POST":
         session["book_id"] = request.form.get("book_id")
     r_book = Book()
     read = r_book.open()
     if session.get("user"):
+        Shelf.add_book(session["book_id"])
         progress = r_book.progress()
         tools = Custom.show()
-        Shelf.add_book(session["book_id"])
-        "words = r_book.meaning()"
-        return render_template("book.html", read = read, tools = tools, progress = progress, state = "True")
+        word = Book.mean(read[1])
+        return render_template("book.html", read = read, tools = tools, word = word, progress = progress, state = "True")
     return render_template("book.html", read = read, state = "False")
 
 
@@ -369,7 +402,7 @@ def close():
     if session.get("user") and session.get("book_id"):
         progress = request.form.get("progress")
         Book.set_progress(progress)
-    return redirect("/")
+    return redirect("/myshelf")
 
 @app.route("/myshelf", methods = ["GET", "POST"])
 def myshelf():
@@ -405,5 +438,6 @@ def remove():
         Shelf.rm_book(b_id)
         return redirect("/myshelf")
     return redirect("/")
+
 
 #############################################################################
