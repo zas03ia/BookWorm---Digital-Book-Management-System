@@ -9,32 +9,40 @@
         <title>Bookworm</title>
 
         <script>
-        scroller = document.querySelector('#scroller')
         window.onscroll = function() {myFunction()};
 
         function myFunction() {
-          var winScroll = document.documentElement.scrollTop;
+          var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
           var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
           var scrolled = (winScroll / height) * 100;
           document.getElementById("myBar").style.width = scrolled + "%";
+          document.getElementById("progress").value = Math.round(scrolled);
+          document.getElementById("show").value = Math.round(scrolled) +"%";
+        }
+        function load() {
+          var myelement = document.getElementById("progress");
+          var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          document.documentElement.scrollTop = myelement.value*height/100;
+          alert("Find your book just as you left! To save changes leave the page using the *Close Book* option on the top-left corner.");
         }
 
         </script>
 
     </head>
 
-   <body>
+   <body onload = "load()">
        <div class="liner" style="right:0px"></div>
         <div class="liner" style="left:0px"></div>
         <div style="background-color: Black; height: 10px; top:0px; position: fixed; width:100%; left:0px;z-index:1;"></div>
         <div style="background-color: DarkGray; height: 30px; top:10px; position: fixed; width:100%; padding-top:2px; z-index:10;">
             {% if state=="True" %}
-            <form action="/close" method="post" style="display: inline;" id="note">
-                <input name="progress" id = "progress" type="hidden">
-                <input type="submit" class="close" value="<< Close Book" >
+            <form action="/close" method="post" style="display: inline;" id="note" style="left:120px;">
+                <input name="progress" id = "progress" type="hidden" value = "{{progress}}">
+                <input type="submit" class="close" value="<< Close Book">
+                <input name="show" id = "show" type="text" value = "{{progress}}" class="close" style ="background-color: Gray; text-align:center;">
             </form>
             <div class="dropdown">
-                <span style="margin-left: 1300px; margin-top: 4px;">Text size</span>
+                <span style="margin-left: 1100px; margin-top: 4px;">Text size</span>
                 <div class="dropdown-content" style="margin-left: 1250px;">
                 <form action="/custom" method="post">
                 <input name="fontsize" type="hidden" value="20px">
@@ -127,12 +135,11 @@
                                 <span>{{j}}</span>
                                 <div class="dropdown-content">
                                     <ul>
-                                     {% for k in [word, meaning] %}
-                                     <li style="color:black;">{{k}}</li>
-                                     {% endfor %}
+                                     <li style="color:black;">{{word[j]}}</li>
                                     </ul>
                                 </div>
                         </div>
+
                     {% endfor %}
                     </div>
                 {% endfor %}

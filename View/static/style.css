@@ -196,9 +196,10 @@ img {
   height: 15px;
   background: Azure;
   opacity: 0.5;
-  border-radius: 5px;
+  border-radius: 7px;
   z-index: 1;
   bottom: 3px;
+  border: 1px solid Maroon;
 }
 
 .progress-bar2 {

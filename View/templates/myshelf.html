@@ -34,13 +34,13 @@
         {% else %}
             {% for mybook in mybooks[0] %}
                 {% set image = mybook.title + '.jpg' %}
-                {% set p = (((mybook['progress'][:-1] |int)/2)|string) + "%" %}
+                {% set p = ((mybook['progress'])|string) + "%" %}
                 <div class="section" style="color: navy;">
                     <img src= "{{url_for('static', filename=image)}}" style="width:150px">
                     <p style="font-size:25px;">Title: {{mybook["title"]}}</p>
                     <p>Author: {{mybook["author"]}}</p>
                     <p>Year: {{mybook["year"]}}</p>
-                    <p style="display: inline; color:Maroon; font-weight: bold; ">{{mybook["progress"]}} &ensp; <div class="progress-container2">
+                    <p style="display: inline; color:#661111; font-weight: bold; ">{{mybook["progress"]}}% &ensp; <div class="progress-container2">
                     <div class="progress-bar2" id="Bar" style="width: {{p}}"></div>
                     </div></p>
                     <form action="/book" method="post" style="display: inline;">

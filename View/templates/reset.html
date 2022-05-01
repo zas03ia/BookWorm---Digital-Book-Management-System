@@ -25,13 +25,16 @@
 
        <div class="box" style="padding-top:110px;">
             <p style="font-size: 25px; color:#262324;">Reset Password</p>
-            <form action="/reset" method="post">
-                {% if state == "2" %}
-                {% if state=="2" or "2_False" %}
+
+                {% if state=="2" or state=="2_False" %}
                 <p style="color:red;">
                     {{message}}
                 </p>
-                {% endif %}
+                <form action="/reset" method="post">
+                <input name="resend" type="hidden" value="true">
+                <input type="submit" value="Resend Verification Code" class="box3">
+                </form>
+                <form action="/reset" method="post">
                 <p>Verification code</p>
                 <input type="text" id="verification code" autocomplete="off" name="verification code" class="box2">
                 <p>New Password</p>
@@ -50,7 +53,7 @@
                     <input type="text" id="email" autocomplete="off" name="email" class="box2">
                     <p><input type="submit" value="Send" class= "box3" style= "width: 70px;"></p>
                 {% endif %}
-            </form>
+                </form>
         </div>
         <div class="bottom"><p style="margin-left: 60px; margin-top: 15px;">For any queries, contact: wormbook081@gmail.com</p></div>
     </body>
