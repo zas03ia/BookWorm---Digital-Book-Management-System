@@ -1,126 +1,107 @@
 import unittest
-import application as a
-import sys
-import flask
+from flask import Flask
+from application import app
 
+class appTest(unittest.TestCase):
 
-
-class TestPerson(unittest.TestCase):
-
-
-    def setUp(self):
-        self.p1 = a.Person()
-        self.p1.username = "zas344"
-        self.p1.email = "zasia.zafreen@g.bracu.ac.bd"
-        self.p1.password = "zasia#123"
-        self.p2 = a.Person()
-        self.p2.username = "wizard"
-        self.p2.email = "zasia.zafreen@gmail.com"
-        self.p2.password = "wizard#123"
-
-
-    def tearDown(self):
-
-        key_id = a.data("select", "person", "id", None, ["username", self.p2.username])[0][0]
-        a.data("delete", "custom", "*", None, ["id", key_id])
-        a.data("delete", "person", "*", None, ["username", self.p2.username])
-
-
-    def test_valid(self):
-
-        self.assertEqual(self.p1.valid, {"username": True, "email": True, "password": True})
-        self.assertEqual(self.p2.valid, {"username": False, "email": False, "password": False})
-
-    def test_verify(self):
-        self.assertEqual(self.p2.verify, True)
-        self.p2.password = "abc"
-        self.assertEqual(self.p2.verify, False)
+    def test_index(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/')
+            self.assertEqual(response.status_code, 200)
+        except:
+            response = tester.post('/')
+            self.assertEqual(response.status_code, 200)
 
     def test_login(self):
-        self.assertEqual(self.p1.login, True)
-        self.assertEqual(self.p2.login, False)
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/login')
+            self.assertEqual(response.status_code, 200)
+        except:
+            response = tester.post('/login')
+            self.assertEqual(response.status_code, 200)
 
-    def test_create_account(self):
+    def test_create(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/create')
+            self.assertEqual(response.status_code, 200)
+        except:
+            response = tester.post('/create')
+            self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(self.p1.create_account, [False, "Invalid Username"])
-        self.p2.email="zasia.zafreen@g.bracu.ac.bd"
-        self.assertEqual(self.p2.create_account, [False, "Account already exists with this email address"])
-        self.p2.email="zasia.zafreen@gmail.com"
-        self.assertEqual(self.p2.create_account, [True])
+    def test_reset(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/reset')
+            self.assertEqual(response.status_code, 200)
+        except:
+            response = tester.post('/reset')
+            self.assertEqual(response.status_code, 200)
 
+    def test_read(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/book')
+            self.assertEqual(response.status_code, 200)
+        except:
+            response = tester.post('/book', data = {"book_id": 1})
+            self.assertEqual(response.status_code, 200)
 
-    def test_reset(self, start, res_code, return_code):
-        pass
-        ### this part is related to the frontend
+    def test_logout(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/logout')
+            self.assertEqual(response.status_code, 302)
+        except:
+            response = tester.post('/logout')
+            self.assertEquals(response.status_code, 302)
 
+    def test_close(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/close')
+            self.assertEqual(response.status_code, 405)
+        except:
+            response = tester.post('/close')
+            self.assertEqual(response.status_code, 302)
 
+    def test_myshelf(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/myshelf')
+            self.assertEqual(response.status_code, 302)
+        except:
+            response = tester.post('/myshelf')
+            self.assertEqual(response.status_code, 302)
 
-###########################################################################################
-class BookTest(unittest.TestCase):
+    def test_custom(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/custom')
+            self.assertEqual(response.status_code, 405)
+        except:
+            response = tester.post('/custom')
+            self.assertEqual(response.status_code, 302)
 
-    @classmethod
-    def Testinfo(cls, user = None):
-        pass
-        ### this part is related to flask session
+    def test_add(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/add')
+            self.assertEqual(response.status_code, 405)
+        except:
+            response = tester.post('/add')
+            self.assertEqual(response.status_code, 302)
 
-    @classmethod
-    def Testset_progress(cls, p):
-        pass
-        ### this part is related to flask session
-
-    def Testopen(self):
-        pass
-        ### this part is related to flask session
-
-    def Testprogress(self):
-        pass
-        ### this part is related to flask session
-
-    @classmethod
-    def Testmean(cls, q= None):
-        pass
-        ### this part is related to flask session
-
-class ShelfTest(unittest.TestCase):
-
-    @classmethod
-    def Testshow(cls):
-        pass
-        ### this part is related to flask session
-
-    @classmethod
-    def Testadd_book(cls, b_id):
-        pass
-        ### this part is related to flask session
-
-    @classmethod
-    def Testrm_book(cls, b_id):
-        pass
-        ### this part is related to flask session
-
-
-
-class CustomTest(unittest.TestCase):
-
-    @classmethod
-    def Testshow(cls):
-        pass
-        ### this part is related to flask session
-
-    @classmethod
-    def Testset_font_size(cls, size):
-        pass
-        ### this part is related to flask session
-
-    @classmethod
-    def Testset_page_color(cls, p_color):
-        pass
-        ### this part is related to flask session
-
-    @classmethod
-    def Testset_text_color(cls, t_color):
-        pass
-        ### this part is related to flask session
+    def test_remove(self):
+        tester = app.test_client(self)
+        try:
+            response = tester.get('/remove')
+            self.assertEqual(response.status_code, 405)
+        except:
+            response = tester.post('/remove')
+            self.assertEqual(response.status_code, 302)
 
 
 if __name__ == '__main__':

@@ -34,25 +34,26 @@ app.secret_key ="bookworm"
 def data(do = None, table = None, col = None, val = None, con = None):
     db = sqlite3.connect("C:\\Users\\Windows\\Documents\\CSE470\\Model\\database.db")
     cur = db.cursor()
-    if do=="select":
+    if do == "select":
         row = None
-        if table!= None:
+        if table != None:
             if len(con) != 0:
                 if table == "dictionary":
-                    row = cur.execute(f"SELECT {col} FROM {table} WHERE {con[0]} LIKE ?",(con[1]+"%",)).fetchall()
+                    row = cur.execute(f"SELECT {col} FROM {table} WHERE {con[0]} LIKE ?", (con[1] + "%",)).fetchall()
                 if len(con) == 2:
-                    row = cur.execute(f"SELECT {col} FROM {table} WHERE {con[0]} = ?",(con[1],)).fetchall()
+                    row = cur.execute(f"SELECT {col} FROM {table} WHERE {con[0]} = ?", (con[1],)).fetchall()
                 else:
-                    row = cur.execute(f"SELECT {col} FROM {table} WHERE {con[0]} = ? AND {con[2]} = ?",(con[1],con[3])).fetchall()
+                    row = cur.execute(f"SELECT {col} FROM {table} WHERE {con[0]} = ? AND {con[2]} = ?",
+                                      (con[1], con[3])).fetchall()
             else:
                 row = cur.execute(f"SELECT {col} FROM {table}").fetchall()
         db.commit()
         db.close()
         return row
-    if do== "insert":
+    if do == "insert":
         key_id = True
-        if table!= None and val!=None:
-            l = "?,"*(len(val)-1)+"?"
+        if table != None and val != None:
+            l = "?," * (len(val) - 1) + "?"
             if col == None:
                 cur.execute(f"INSERT INTO {table} VALUES ({l})", val)
             else:
@@ -61,20 +62,21 @@ def data(do = None, table = None, col = None, val = None, con = None):
         db.close()
         return key_id
     if do == "update":
-        if table!= None and col!= None and con!= None and val!= None:
-            if len(con)==2:
+        if table != None and col != None and con != None and val != None:
+            if len(con) == 2:
                 cur.execute(f"Update {table} SET {col} = ? WHERE {con[0]} = ?", (val[0], con[1]))
-            if len(con)==4:
-                cur.execute(f"Update {table} SET {col} = ? WHERE {con[0]} = ? AND {con[2]} = ?", (val[0], con[1], con[3]))
+            if len(con) == 4:
+                cur.execute(f"Update {table} SET {col} = ? WHERE {con[0]} = ? AND {con[2]} = ?",
+                            (val[0], con[1], con[3]))
         db.commit()
         db.close()
         return True
 
     if do == "delete":
-        if table!=None and con!= None:
-            if len(con)==4:
+        if table != None and con != None:
+            if len(con) == 4:
                 cur.execute(f"DELETE FROM {table} WHERE {con[0]} = ? AND {con[2]} = ?", (con[1], con[3]))
-            if len(con)==2:
+            if len(con) == 2:
                 cur.execute(f"DELETE FROM {table} WHERE {con[0]} = ?", (con[1],))
         db.commit()
         db.close()
@@ -88,11 +90,11 @@ def load():
     d = {}
     dict = data("select", "dictionary", "*", None, [])
     for i in dict:
-        d[i[0].lower()]= i[1]
+        d[i[0].lower()] = i[1]
     return d
 
-Dictionary = load()
 
+Dictionary = load()
 
 
 # Define object-classes
@@ -104,15 +106,17 @@ class Person():
         if session.get("user"):
             self.id = data("select", "person", "id", None, ["username", str(session.get("user"))])[0][0]
             session["id"] = self.id
-            self.email = session["email"] = data("select", "person", "email", None, ["username", str(session.get("user"))])[0][0]
+            self.email = session["email"] = \
+            data("select", "person", "email", None, ["username", str(session.get("user"))])[0][0]
         else:
             self.id = None
             session["id"] = None
+
     def valid(self):
         us = True
         em = True
         pw = True
-        if len(data("select", "person", "*", None, ["username",str(self.username)])) == 0:
+        if len(data("select", "person", "*", None, ["username", str(self.username)])) == 0:
             us = False
         if len(data("select", "person", "*", None, ["email", str(self.email)])) == 0:
             em = False
@@ -132,7 +136,7 @@ class Person():
                 break
         for i in "1234567890":
             if i in pw:
-                check +=1
+                check += 1
                 break
         for k in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ":
             if k in pw:
@@ -143,7 +147,8 @@ class Person():
         return False
 
     def login(self):
-        if len(data("select", "person", "*", None, ["username", str(self.username), "password", str(self.password)])) != 0:
+        if len(data("select", "person", "*", None,
+                    ["username", str(self.username), "password", str(self.password)])) != 0:
             return True
         return False
 
@@ -170,12 +175,12 @@ class Person():
     def reset(self, start, res_code, return_code):
         stop = time.time()
         if stop - start > 320 or str(res_code) != return_code:
-            return [False,"Invalid code!"]
-        if self.verify() == False or self.valid()["password"]==True:
-            return [False,"Invalid password!"]
-        data("update", "person", "password", (session.get("password"),), ["email", str(self.email)])
+            return [False, "Invalid code!"]
+        if self.verify() == False or self.valid()["password"] == True:
+            return [False, "Invalid password!"]
+        data("update", "person", "password", (session.get("password"),), ["email", session.get("Email")])
+        session["Email"] = None
         return [True]
-
 
 
 ###########################################################################################
@@ -184,7 +189,7 @@ class Book():
         self.id = session["book_id"]
 
     @classmethod
-    def info(cls, user = None):
+    def info(cls, user=None):
         if session.get("user"):
             load_per = data("select", "relation", "book_id", None, ["user_id", session["id"]])
             load_total = data("select", "books", "id", None, [])
@@ -205,7 +210,7 @@ class Book():
         return
 
     def open(self):
-        book = data("select", "books", "title, content", None, ["id", self.id])
+        book = data("select", "books", "title, content", None, ["id", session.get("book_id")])
         lines = book[0][1].split("\n")
         for i in range(len(lines)):
             lines[i] = lines[i].strip().split(" ")
@@ -217,33 +222,35 @@ class Book():
 
     @classmethod
     def mean(cls, lines):
-        d={}
+        d = {}
         for line in lines:
             for word in line:
                 word2 = word.lower()
                 while (True):
-                    if len(word2)==0:
+                    if len(word2) == 0:
                         break
-                    if word2[len(word2)-1] in "abcdefghijklmnopqrstuvwxyz":
+                    if word2[len(word2) - 1] in "abcdefghijklmnopqrstuvwxyz":
                         break
                     word2 = word2[0:-1]
                 if word2 in Dictionary.keys():
                     meaning = Dictionary[word2]
                     d[word] = meaning.split("##")
+                else:
+                    d[word] = []
         return d
+
 
 class Shelf():
 
     @classmethod
     def show(cls):
-        shelf=[]
+        shelf = []
         load = data("select", "relation", "book_id, progress", None, ["user_id", session.get("id")])
-        if len(load)!=0:
+        if len(load) != 0:
             for i in load:
                 book = data("select", "books", "title, author, year", None, ["id", i[0]])[0]
-                shelf+=[{"id": i[0], "title": book[0], "author": book[1], "year": book[2] , "progress": i[1]}]
+                shelf += [{"id": i[0], "title": book[0], "author": book[1], "year": book[2], "progress": i[1]}]
         return (shelf, len(shelf))
-
 
     @classmethod
     def add_book(cls, b_id):
@@ -259,7 +266,6 @@ class Shelf():
         if session.get("user"):
             data("delete", "relation", None, None, ['user_id', session.get("id"), 'book_id', b_id])
         return
-
 
 
 class Custom():
@@ -285,10 +291,7 @@ class Custom():
         return
 
 
-
-
 #########################################################
-
 
 
 ## FLASK routes defined
@@ -298,11 +301,12 @@ def index():
         user = Person()
         books = Book.info(user)
         state = "True"
-        return render_template("home.html", books=books, state = state, username = user.username, email = user.email )
+        return render_template("home.html", books=books, state=state, username=user.username, email=user.email)
     else:
         books = Book.info()
         state = "False"
-        return render_template("home.html",  books=books, state = state)
+        return render_template("home.html", books=books, state=state)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -316,8 +320,9 @@ def login():
         if user.login():
             session["user"] = request.form.get("username")
             return redirect("/")
-        return render_template("login.html", state = "False", message = "Invalid username or password!")
-    return render_template("login.html", state = "True")
+        return render_template("login.html", state="False", message="Invalid username or password!")
+    return render_template("login.html", state="True")
+
 
 @app.route("/create", methods=["GET", "POST"])
 def create():
@@ -329,11 +334,11 @@ def create():
         session["password"] = request.form.get("password")
         user = Person()
         account = user.create_account()
-        if account[0]==True:
+        if account[0] == True:
             session["user"] = request.form.get("username")
             return redirect("/")
-        return render_template("create_account.html", state = "False", message = account[1])
-    return render_template("create_account.html", state = "True")
+        return render_template("create_account.html", state="False", message=account[1])
+    return render_template("create_account.html", state="True")
 
 
 @app.route("/reset", methods=["GET", "POST"])
@@ -343,38 +348,41 @@ def reset():
     if request.method == "POST":
         if not request.form.get("resend"):
             session["email"] = request.form.get("email")
+            if session["email"]:
+                session["Email"] = session.get("email")
         session["username"] = None
         session["password"] = None
-        user= Person()
+        user = Person()
         if session["email"] or request.form.get("resend"):
             if user.valid()["email"] or request.form.get("resend"):
-                session["res_code"] = random.randrange(100000,999999)
-                memo = Message("Verification Code", sender = "wormbook081@gmail.com", recipients=[user.email])
+                session["res_code"] = random.randrange(100000, 999999)
+                memo = Message("Verification Code", sender="wormbook081@gmail.com", recipients=[user.email])
                 memo.body = f"Your BOOKWORM Verification Code: {session.get('res_code')}\nReset your password within 5 minutes otherwise the code will expire."
                 mail.send(memo)
                 session["start"] = time.time()
-                return render_template("reset.html", state = "2", message = "Verification code sent! It will expire in 5 minutes")
-            return render_template("reset.html", state = "e_False", message = "No user account with this email address")
+                return render_template("reset.html", state="2",
+                                       message="Verification code sent! It will expire in 5 minutes")
+            return render_template("reset.html", state="e_False", message="No user account with this email address")
         else:
             if session["email"] == '':
-                return render_template("reset.html", state = "e_False", message = "Please provide an email address")
+                return render_template("reset.html", state="e_False", message="Please provide an email address")
             else:
                 session["return_code"] = request.form.get("verification code")
                 session["password"] = request.form.get("password")
-                reset_return= user.reset(session.get("start"), session.get("res_code"), session.get("return_code"))
+                reset_return = user.reset(session.get("start"), session.get("res_code"), session.get("return_code"))
                 if reset_return[0]:
-                    session["start"]=None
-                    session["res_code"]=None
-                    session["return_code"] = None
-                    return render_template("login.html", state = "False", message = "Reset Password Successful! You may log in!")
-                return render_template("reset.html", state = "2_False", message = reset_return[1])
-    return render_template("reset.html", state = "1")
+                    session["start"] = None
+                    session["res_code"] = None
+                    session["return_code"] = ''
+                    return render_template("login.html", state="False",
+                                           message="Reset Password Successful! You may log in!")
+                return render_template("reset.html", state="2_False", message=reset_return[1])
+    return render_template("reset.html", state="1")
 
 
 #######################################################################################
 @app.route("/book", methods=["GET", "POST"])
 def read():
-    session["book_id"] = None
     if request.method == "POST":
         session["book_id"] = request.form.get("book_id")
     r_book = Book()
@@ -384,11 +392,11 @@ def read():
         progress = r_book.progress()
         tools = Custom.show()
         word = Book.mean(read[1])
-        return render_template("book.html", read = read, tools = tools, word = word, progress = progress, state = "True")
-    return render_template("book.html", read = read, state = "False")
+        return render_template("book.html", read=read, tools=tools, word=word, progress=progress, state="True")
+    return render_template("book.html", read=read, state="False")
 
 
-@app.route("/logout", methods = ["GET","POST"])
+@app.route("/logout", methods=["GET", "POST"])
 def logout():
     session["username"] = None
     session["email"] = None
@@ -398,21 +406,23 @@ def logout():
     return redirect("/")
 
 
-@app.route("/close", methods = ["POST"])
+@app.route("/close", methods=["POST"])
 def close():
     if session.get("user") and session.get("book_id"):
         progress = request.form.get("progress")
         Book.set_progress(progress)
     return redirect("/myshelf")
 
-@app.route("/myshelf", methods = ["GET", "POST"])
+
+@app.route("/myshelf", methods=["GET", "POST"])
 def myshelf():
     if session.get("user"):
         mybooks = Shelf.show()
-        return render_template("myshelf.html", mybooks = mybooks)
+        return render_template("myshelf.html", mybooks=mybooks)
     return redirect("/")
 
-@app.route("/custom", methods = ["POST"])
+
+@app.route("/custom", methods=["POST"])
 def custom():
     if request.form.get("fontsize"):
         Custom.set_font_size(request.form.get("fontsize"))
@@ -423,7 +433,7 @@ def custom():
     return redirect("/book")
 
 
-@app.route("/add", methods = ["POST"])
+@app.route("/add", methods=["POST"])
 def add():
     if session.get("user"):
         b_id = request.form.get("book_id")
@@ -432,7 +442,7 @@ def add():
     return redirect("/")
 
 
-@app.route("/remove", methods = ["POST"])
+@app.route("/remove", methods=["POST"])
 def remove():
     if session.get("user"):
         b_id = request.form.get("book_id")
@@ -442,3 +452,5 @@ def remove():
 
 
 #############################################################################
+if __name__ == '__main__':
+    app.run()
