@@ -13,12 +13,12 @@ static_dir = os.path.abspath('C:/Users/Windows/Documents/CSE470/View/static')
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
 
-app.config["MAIL_DEFAULT_SENDER"] = "wormbook081@gmail.com"
-app.config["MAIL_PASSWORD"] = "bookworm#1"
+app.config["MAIL_DEFAULT_SENDER"] = "<email address>"
+app.config["MAIL_PASSWORD"] = "<password>"
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
 app.config["MAIL_USE_TLS"] = True
-app.config["MAIL_USERNAME"] = "wormbook081@gmail.com"
+app.config["MAIL_USERNAME"] = "<username>"
 app.config["DEBUG"] = True
 
 mail = Mail(app)
